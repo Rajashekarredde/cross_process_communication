@@ -3,8 +3,29 @@ syntax = "proto3";
 package mpi;
 
 service MPIService {
+  rpc Send(SendRequest) returns (SendResponse) {}
+  rpc Recv(RecvRequest) returns (RecvResponse) {}
   rpc Barrier(BarrierRequest) returns (BarrierResponse) {}
   rpc IBarrier(IBarrierRequest) returns (IBarrierResponse) {}
+}
+
+message SendRequest {
+  int32 sender_rank = 1;
+  int32 receiver_rank = 2;
+  string message = 3;
+}
+
+message SendResponse {
+  bool success = 1;
+}
+
+message RecvRequest {
+  int32 receiver_rank = 1;
+}
+
+message RecvResponse {
+  int32 sender_rank = 1;
+  string message = 2;
 }
 
 message BarrierRequest {
