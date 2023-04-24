@@ -86,7 +86,7 @@ class MPIClient {
 void RunClient(int process_rank) {
   MPIClient client(grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials()));
 
-  // Simulate MPI_Send() and MPI_Recv() operations
+  // Simulating MPI_Send() and MPI_Recv() operations
   if (process_rank == 0) {
     client.Send(0, 1, "Hello from process 0!");
     client.Barrier(process_rank);
@@ -97,7 +97,7 @@ void RunClient(int process_rank) {
     client.Barrier(process_rank);
   }
 
-  // Simulate MPI_Barrier() operation
+  // Simulating MPI_Barrier() operation
   bool barrier_success = client.Barrier(process_rank);
   if (barrier_success) {
     std::cout << "Process " << process_rank << " passed the barrier." << std::endl;
@@ -105,7 +105,7 @@ void RunClient(int process_rank) {
     std::cout << "Failed to pass the barrier for process " << process_rank << "." << std::endl;
   }
 
-  // Simulate MPI_IBarrier() operation
+  // Simulating MPI_IBarrier() operation
   bool ibarrier_success = client.IBarrier(process_rank);
   if (ibarrier_success) {
     std::cout << "Process " << process_rank << " entered the IBarrier." << std::endl;
