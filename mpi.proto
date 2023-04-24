@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package mpi;
+
+service MPIService {
+  rpc Barrier(BarrierRequest) returns (BarrierResponse) {}
+  rpc IBarrier(IBarrierRequest) returns (IBarrierResponse) {}
+}
+
+message BarrierRequest {
+  int32 process_rank = 1;
+}
+
+message BarrierResponse {
+  bool success = 1;
+}
+
+message IBarrierRequest {
+  int32 process_rank = 1;
+}
+
+message IBarrierResponse {
+  bool success = 1;
+}
