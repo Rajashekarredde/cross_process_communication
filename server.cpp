@@ -8,18 +8,41 @@ using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
 using mpi::MPIService;
+using mpi::SendRequest;
+using mpi::SendResponse;
+using mpi::RecvRequest;
+using mpi::RecvResponse;
 using mpi::BarrierRequest;
 using mpi::BarrierResponse;
 using mpi::IBarrierRequest;
 using mpi::IBarrierResponse;
 
 class MPIServiceImpl final : public MPIService::Service {
+  std::map<int32_t, std::string> messages_;
   std::atomic<int> barrier_count_{0};
   std::atomic<int> ibarrier_count_{0};
-  int comm_size_; // Total number of processes
+  int comm_size_;
 
  public:
   MPIServiceImpl(int comm_size) : comm_size_(comm_size) {}
+
+  Status Send(ServerContext* context, const SendRequest* request, SendResponse* response) override {
+    messages_[request->receiver_rank()] = request->message();
+    response->set_success(true);
+    return Status::OK;
+  }
+
+  Status Recv(ServerContext* context, const RecvRequest* request, RecvResponse* response) override {
+    auto it = messages_.find(request->receiver_rank());
+    if (it != messages_.end()) {
+      response->set_sender_rank(it->first);
+      response->set_message(it->second);
+      messages_.erase(it);
+    } else {
+      return Status(grpc::StatusCode::NOT_FOUND, "Message not found");
+    }
+    return Status::OK;
+  }
 
   Status Barrier(ServerContext* context, const BarrierRequest* request, BarrierResponse* response) override {
     int process_rank = request->process_rank();
@@ -63,3 +86,4 @@ int main(int argc, char** argv) {
   RunServer(comm_size);
   return 0;
 }
+
